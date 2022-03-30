@@ -1,28 +1,56 @@
 import client from "../client";
 
-const fields = `
+const movieFields = `
+_id,
   title,
-  actor,
-  fullname, 
-  "name": name.current
+ "actor": actor->fullname
 `
+const actorFields = `
+_id,
+fullname,
+"name": name.current,
+`
+// "slug": slug.current,
+// "actor": actor->name.current
+
+//_id, title, releaseYear
+
+//*[_type == 'actor' && movie >= titanic] | order(movie) {
+//     ... 
+// } 
 
 export async function getMovies() {
-  const data = await client.fetch(`*[_type == "movie"]{${fields}}`)
-  return data
+  const data = await client.fetch(`*[_type == "movie"]{${movieFields}}`)
+  return data;
 }
 
-// export async function getQuizByCategory(category) {
-//   const data = await client.fetch(
-//     `*[_type == "quiz" && category->name.current==$category]{${fields}}`,
-//     { category }
-//   )
-//   return data
-// }
+export async function getActors() {
+    const data = await client.fetch(`*[_type == "actor"]{${actorFields}}`)
+    return data;
+  }
 
-// export async function getQuizBySlug(slug) {
-//   const data = await client.fetch(
-//     `*[_type == "quiz" && slug.current == $slug]{${fields}}`, 
-//     { slug } )
-//   return data?.[0]
+ export async function getMovieByActor() {
+    const data = await client.fetch(
+      `*[_type == "actor]{
+        _id, fullname, "name": name.current,
+        "movies": *[_type == "movie" && references(^._id)].title
+      }`,
+    )
+    return data
+  }
+
+//   export async function getMovieByActor(actor) {
+//     const data = await client.fetch(`*[_type == "movie" && actor->name.current=$actor]{${actorFields}}`)
+//     {actor}
+//     return data;
+//   }
+
+
+//   export async function getMovieByActor(actor) {
+//     const data = await client.fetch(
+//       `*[_type == "movie" && actor->name.current == $actor]{_id, title, "actor": actor->{fullname,
+//         "name": name.current}`,
+//       { actor }
+//     )
+//     return data;
 // }
