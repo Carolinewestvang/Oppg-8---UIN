@@ -9,6 +9,7 @@ const actorFields = `
 _id,
 fullname,
 "name": name.current,
+"movies": *[_type == "movie" && references(^._id)].title
 `
 // "slug": slug.current,
 // "actor": actor->name.current
@@ -31,12 +32,10 @@ export async function getActors() {
 
  export async function getMovieByActor() {
     const data = await client.fetch(
-      `*[_type == "actor]{
-        _id, fullname, "name": name.current,
-        "movies": *[_type == "movie" && references(^._id)].title
-      }`,
+      `*[_type == "actor"]{
+        "movies": *[_type == "movie" && references(^._id)].title, _id, "name": name.current}`
     )
-    return data
+    return data;
   }
 
 //   export async function getMovieByActor(actor) {
